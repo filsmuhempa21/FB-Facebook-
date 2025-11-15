@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Jeu de course 2D</title>
+  <style>
+    body { margin: 0; background: #111; }
+    canvas { display: block; margin: auto; background: #444; }
+    #touchControls {
+      position: absolute; bottom: 20px; width: 100%; text-align: center;
+    }
+    .btn {
+      background: #fff; padding: 20px; margin: 0 10px;
+      border-radius: 10px; display: inline-block; opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+<div id="touchControls">
+  <div class="btn" ontouchstart="keys.left=true" ontouchend="keys.left=false">⬅️</div>
+  <div class="btn" ontouchstart="keys.right=true" ontouchend="keys.right=false">➡️</div>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const car = { x: 180, y: 500, w: 40, h: 60, speed: 5 };
+let score = 0;
+const obstacles = [];
+const keys = { left: false, right: false };
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") keys.left = true;
+  if (e.key === "ArrowRight") keys.right = true;
+});
+document.addEventListener("keyup", e => {
+  if (e.key === "ArrowLeft") keys.left = false;
+  if (e.key === "ArrowRight") keys.right = false;
+});
+
+function spawnObstacle() {
+  const x = Math.floor(Math.random() * (canvas.width - 40));
+  obstacles.push({ x, y: -60, w: 40, h: 60 });
+}
+
+function update() {
+  if (keys.left && car.x > 0) car.x -= car.speed;
+  if (keys.right && car.x < canvas.width - car.w) car.x += car.speed;
+
+  for (let obs of obstacles) {
+    obs.y += 4;
+    if (
+      car.x < obs.x + obs.w &&
+      car.x + car.w > obs.x &&
+      car.y < obs.y + obs.h &&
+      car.y + car.h > obs.y
+    ) {
+      alert("Collision ! Score: " + score);
+      document.location.reload();
+    }
+  }
+
+  obstacles.filter(o => o.y < canvas.height);
+  score++;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Route
+  ctx.fillStyle = "#D8B291";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Voiture
+  ctx.fillStyle = "red";
+  ctx.fillRect(car.x, car.y, car.w, car.h);
+
+  // Obstacles
+  ctx.fillStyle = "#8A927D";
+  for (let obs of obstacles) {
+    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+  }
+
+  // Score
+  ctx.fillStyle = "#5E5E61";
+  ctx.font = "20px Arial";
+  ctx.fillText("Score: " + score, 10, 30);
+}
+  function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+setInterval(spawnObstacle, 1000);
+loop();
+</script>
+
+</body>
+</html>
+  <img src="vue-de-dessus-d-une-maison.jpg"><img>
